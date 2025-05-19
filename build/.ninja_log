@@ -1,0 +1,9 @@
+# ninja log v5
+0	3	1747654736406239492	ex0-define_dialect/include/Dialect/Exec/IR/ExecDialect.h.inc	a87a115973136626
+0	3	1747654736406239492	/home/workspace/wrq/mlir-exec/build/ex0-define_dialect/include/Dialect/Exec/IR/ExecDialect.h.inc	a87a115973136626
+3	1674	1747654738076239157	ex0-define_dialect/lib/Dialect/Exec/IR/CMakeFiles/obj.MLIRExecDialect0.dir/ExecDialect.cpp.o	b5edd0d72c223a29
+0	3	1747654736406239492	ex0-define_dialect/include/Dialect/Exec/IR/ExecDialect.cpp.inc	fe703310a7bf6582
+3	1699	1747654738096239151	ex0-define_dialect/CMakeFiles/Exec-0.dir/main.cpp.o	2575a0b1aeadd5cb
+0	3	1747654736406239492	/home/workspace/wrq/mlir-exec/build/ex0-define_dialect/include/Dialect/Exec/IR/ExecDialect.cpp.inc	fe703310a7bf6582
+1674	1678	1747654738076239157	ex0-define_dialect/lib/Dialect/Exec/IR/libMLIRExecDialect0.a	ce361f2f7e38613b
+1699	1934	1747654738336239105	ex0-define_dialect/Exec-0	bf77a53bbdeb5c82
