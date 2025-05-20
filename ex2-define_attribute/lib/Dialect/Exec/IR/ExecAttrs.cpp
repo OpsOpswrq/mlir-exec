@@ -26,7 +26,7 @@ namespace mlir::exec{
     // 在td文件中使用了genVerifyDecl属性，所以需要使用到verify方法
     LogicalResult ExecCIntAttr::verify(function_ref<InFlightDiagnostic()> emitError, int64_t cnt){
         if(cnt <= 0){
-            emitError() << "the cnt attribute is must bigger than zero \n";
+            return emitError() << "the cnt attribute is must bigger than zero \n";
         }
         return success();
     }
