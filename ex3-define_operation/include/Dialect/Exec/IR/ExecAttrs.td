@@ -28,7 +28,7 @@ def Exec_CIntAttr : Exec_Attr<"ExecCInt", "eCInt", []>{
     let genStorageClass = 1;
     let skipDefaultBuilders = 0;
     let hasStorageCustomConstructor = 0;
-    let assemblyFormat = "`<` $cnt `>`";
+    let assemblyFormat = "`<` `cnts` `=`  $cnt `>`";
     let builders = [
         AttrBuilder<(ins "int64_t":$cnt)>,
         AttrBuilder<(ins 
