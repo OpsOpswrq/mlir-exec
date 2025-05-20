@@ -14,6 +14,8 @@ class Exec_Type<string name, string typeMnemonic, list<Trait> traits = [], strin
 }
 
 // 下面开始自定义需要的类型了 def 开始定义了
+// eInt就是.mlir中的类型语法的写法
+// %a = some_op : !exec.eInt
 def Exec_IntType : Exec_Type<"ExecInt", "eInt", []>{
     let summary = "Exec_Dialect Int Type";
     let description = [{
