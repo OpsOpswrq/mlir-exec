@@ -8,6 +8,7 @@
 #include "Dialect/Exec/IR/ExecOps.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/DialectRegistry.h"
+#include "mlir/IR/BuiltinTypes.h"
 
 #include <cstdlib>   // std::atoi
 #include <iostream>  // std::cerr
@@ -51,47 +52,60 @@ void Exec2(llvm::StringRef name, int64_t integerInput, unsigned width = 16, int6
     eCInt.dump();
 }
 
-void Exec3(llvm::StringRef name, int64_t lhs, int64_t rhs, unsigned width = 16, int64_t cnt = 1){
-    mlir::DialectRegistry registry;
-    registry.insert<mlir::func::FuncDialect>();
-    registry.insert<mlir::exec::ExecDialect>();
-    mlir::MLIRContext context(registry);
-
-    auto *dialect = context.getOrLoadDialect<mlir::exec::ExecDialect>();
+void Exec3(llvm::StringRef name, int64_t lhsValue, int64_t rhsValue, unsigned width = 16, int64_t cnt = 1) {
+    // 创建上下文并加载方言
+    mlir::MLIRContext context;
+    context.loadDialect<mlir::func::FuncDialect>();
+    context.loadDialect<mlir::exec::ExecDialect>();
+    
+    // 获取方言并打印欢迎信息
+    auto *dialect = context.getLoadedDialect<mlir::exec::ExecDialect>();
     dialect->sayHello(name);
-
-    auto execTy = mlir::exec::ExecIntType::get(&context, width, lhs);
-    auto cntAttr = mlir::exec::ExecCIntAttr::get(&context, cnt);
-
+    
+    // 创建构建器和位置
     mlir::OpBuilder builder(&context);
     auto loc = builder.getUnknownLoc();
-
-    auto module = builder.create<mlir::ModuleOp>(loc, "Exec");
+    
+    // 创建模块
+    auto module = builder.create<mlir::ModuleOp>(loc);
     builder.setInsertionPointToStart(module.getBody());
-
-    // 创建一个函数用于放置 AddOp
-    // auto funcType = builder.getFunctionType({}, {});
-    // auto func = builder.create<mlir::func::FuncOp>(loc, "test_add", funcType);
-    // auto &entryBlock = *func.addEntryBlock();
-
-    // builder.setInsertionPointToStart(&entryBlock);
-    // 这里定义相应的操作出现问题
-    // // 添加两个 block 参数作为 lhs 和 rhs
-    // auto lhsVal = entryBlock.addArgument(execTy, loc);
-    // auto rhsVal = entryBlock.addArgument(execTy, loc);
-
-    // auto addOp = builder.create<mlir::exec::AddOp>(
-    //     loc,
-    //     execTy,
-    //     lhs,
-    //     rhs,
-    //     cntAttr
-    // );
-
-    // llvm::outs() << "Created AddOp:\n";
-    // addOp.dump();
+    
+    // 创建类型
+    auto lhsType = mlir::exec::ExecIntType::get(&context, width, lhsValue);
+    auto rhsType = mlir::exec::ExecIntType::get(&context, width, rhsValue);
+    // 创建函数类型，包含两个参数，一个返回值
+    auto funcType = builder.getFunctionType({lhsType, rhsType}, {lhsType});
+    auto func = builder.create<mlir::func::FuncOp>(loc, "test_add", funcType);
+    
+    // 添加入口块
+    auto &entryBlock = *func.addEntryBlock();
+    builder.setInsertionPointToStart(&entryBlock);
+    
+    // 获取块参数作为操作数（这些是函数参数，而不是常量）
+    auto lhsVal = entryBlock.getArgument(0);
+    auto rhsVal = entryBlock.getArgument(1);
+    
+    // 创建 cnt 属性
+    auto cntAttr = mlir::exec::ExecCIntAttr::get(&context, cnt);
+    
+    // 创建 AddOp 操作
+    auto addOp = builder.create<mlir::exec::AddOp>(
+        loc,
+        lhsVal,
+        rhsVal,
+        cntAttr
+    );
+    
+    // 创建返回操作，返回 addOp 的结果
+    builder.create<mlir::func::ReturnOp>(loc, addOp.getResult());
+    
+    // 打印创建的操作和模块
+    llvm::outs() << "Created AddOp:\n";
+    addOp.dump();
+    
+    llvm::outs() << "\nCreated module:\n";
+    module.dump();
 }
-
 
 int main(int argc, char **argv) {
     if (argc == 2) {

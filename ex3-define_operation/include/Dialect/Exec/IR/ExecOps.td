@@ -1,22 +1,24 @@
 #ifndef INCLUDE_DIALECT_EXEC_IR_EXECOPS_TD
 #define INCLUDE_DIALECT_EXEC_IR_EXECOPS_TD
-// 添加相应的头文件
+
+// Include required header files
 include "mlir/IR/BuiltinDialect.td"
 include "mlir/IR/Constraints.td"
 include "mlir/IR/OpBase.td"
 include "mlir/Interfaces/InferTypeOpInterface.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
-// 添加自定义操作所需的头文件
+
+// Include custom operation required header files
 include "Dialect/Exec/IR/ExecDialect.td"
 include "Dialect/Exec/IR/ExecAttrs.td"
 include "Dialect/Exec/IR/ExecTypes.td"
 include "Dialect/Exec/IR/ExecConstraints.td"
 
-// 定义操作基类
+// Define base operation class
 class Exec_Ops<string mnemonic, list<Trait> traits = []>
     : Op<Exec_Dialect, mnemonic, traits>;
 
-// 抽象的二元操作模板：用于定义类似 Add/Sub/Mul 等操作
+// Abstract binary operation template: for operations like Add/Sub/Mul
 class Exec_BinaryOps<string mnemonic, Type operandType, Type resultType = operandType,
                      list<Trait> traits = [], dag attributes = (ins)>
     : Exec_Ops<mnemonic, traits#[]> {
@@ -25,7 +27,7 @@ class Exec_BinaryOps<string mnemonic, Type operandType, Type resultType = operan
 
     let hasVerifier = 1;
 
-    // 链接的内容
+    // Arguments definition
     let arguments = !con((ins
         operandType:$lhs,
         operandType:$rhs),
@@ -37,39 +39,51 @@ class Exec_BinaryOps<string mnemonic, Type operandType, Type resultType = operan
     );
 
     let skipDefaultBuilders = 1;
-
+    
+    // Custom builder methods
     let builders = [
-        OpBuilder<(ins
-            "Type":$resultType,
-            "Value":$lhs,
-            "Value":$rhs,
-            "Attribute":$cntAttr
-        )>,
-        OpBuilder<(ins
-            "OpBuilder &":$builder,
-            "OperationState &":$state,
-            "Value":$lhs,
-            "Value":$rhs,
-            "int64_t":$cnt
-        ), [{
-            auto cntAttr = ::mlir::exec::ExecCIntAttr::get(builder.getContext(), cnt);
-            auto resultType = lhs.getType();
-            state.addOperands({lhs, rhs});
-            state.addTypes(resultType);
-            state.addAttribute("cnt", cntAttr);
+        // 自定义构建器 1：使用操作数和属性创建操作
+        OpBuilder<(ins "Value":$lhs, "Value":$rhs, "::mlir::exec::ExecCIntAttr":$cnt),
+        [{
+            $_state.addOperands({lhs, rhs});
+            $_state.addAttribute("cnt", cnt);
+            $_state.addTypes({lhs.getType()});
+        }]>,
+        
+        // 自定义构建器 2：使用操作数和整数值创建操作
+        OpBuilder<(ins "Value":$lhs, "Value":$rhs, "int64_t":$cntVal),
+        [{
+            $_state.addOperands({lhs, rhs});
+            auto cntAttr = ::mlir::exec::ExecCIntAttr::get($_builder.getContext(), cntVal);
+            $_state.addAttribute("cnt", cntAttr);
+            $_state.addTypes({lhs.getType()});
+        }]>,
+        
+        // 自定义构建器 3：仅使用操作数创建操作，使用默认属性值
+        OpBuilder<(ins "Value":$lhs, "Value":$rhs),
+        [{
+            $_state.addOperands({lhs, rhs});
+            auto cntAttr = ::mlir::exec::ExecCIntAttr::get($_builder.getContext(), 1);
+            $_state.addAttribute("cnt", cntAttr);
+            $_state.addTypes({lhs.getType()});
         }]>
     ];
-
 }
 
-
-// 加法操作
-// 后续需要修改，接着修改
+// Addition operation definition
 def Exec_AddOp : Exec_BinaryOps<"ExecAdd",
     ExecOpsTypeConstraint, ExecOpsTypeConstraint,
     [Pure, SameOperandsAndResultType],
-    (ins I64Attr:$cnt)> {
+    (ins ExecOpsAttrConstraint:$cnt)> {
     let summary = "Addition for ExecIntType";
+    let description = [{
+        The ExecAdd operation performs addition of two exec.int values with a count attribute.
+        
+        Example:
+        ```mlir
+        %result = exec.ExecAdd %a, %b { cnt = 42 } : !exec.int
+        ```
+    }];
 }
 
 #endif // INCLUDE_DIALECT_EXEC_IR_EXECOPS_TD
