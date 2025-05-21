@@ -32,9 +32,12 @@ include(MLIRConfig)
 include_directories(${LLVM_INCLUDE_DIRS})
 include_directories(${MLIR_INCLUDE_DIRS})
 # 获取MLIR的dialect、conversion、extension库
+# 在对应MLIRConfig.cmake 文件中
+get_property(all_libs GLOBAL PROPERTY MLIR_ALL_LIBS)
 get_property(dialect_libs GLOBAL PROPERTY MLIR_DIALECT_LIBS)
 get_property(conversion_libs GLOBAL PROPERTY MLIR_CONVERSION_LIBS)
 get_property(extension_libs GLOBAL PROPERTY MLIR_EXTENSION_LIBS)
+get_property(translation_libs GLOBAL PROPERTY MLIR_TRANSLATION_LIBS)
 # 之后可能通过这个操作将链接库进行链接
 # target_link_libraries(your_target ${dialect_libs} ${conversion_libs} ${extension_libs})
 # 添加子目录
@@ -42,7 +45,6 @@ add_subdirectory(ex0-define_dialect)
 add_subdirectory(ex1-define_type)
 add_subdirectory(ex2-define_attribute)
 add_subdirectory(ex3-define_operation)
-add_subdirectory(ex4-define_interface)
-add_subdirectory(ex5-define_pass)
-add_subdirectory(ex6-rewrite_pattern)
-add_subdirectory(ex7-lit_for_test)
+add_subdirectory(ex4-define_pass)
+add_subdirectory(ex5-rewrite_pattern)
+add_subdirectory(ex6-lit_for_test)
