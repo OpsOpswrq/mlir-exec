@@ -49,9 +49,9 @@ struct ApplyRewritePatternForExecAddOp : public OpRewritePattern<::mlir::exec::A
         auto intType = IntegerType::get(rewriter.getContext(), width);  // signless i64
 
         auto lhsConst = rewriter.create<arith::ConstantOp>(
-            loc, intType, rewriter.getIntegerAttr(intType, lhsValue));
+            loc, intType, rewriter.getIntegerAttr(intType, lhsValue * cntValue));
         auto rhsConst = rewriter.create<arith::ConstantOp>(
-            loc, intType, rewriter.getIntegerAttr(intType, rhsValue));
+            loc, intType, rewriter.getIntegerAttr(intType, rhsValue * cntValue));
 
         auto addOp = rewriter.create<arith::AddIOp>(loc, lhsConst, rhsConst);
 
