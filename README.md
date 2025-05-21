@@ -14,3 +14,4 @@ Detail for each chapter just looking into the specifical chapter main.cpp
 | ex2-define_attribute | define a attribute for the dialect | bash make.sh Exec-2 |
 |ex3-define_operation| define a operation for the dialect|bash make.sh Exec-3|
 |ex4-define_pass|define a pass for the dialect|bash make.sh Exec-4|
+|ex5-rewrite_pattern|for a op to define a rewrite pattern, and transformation its operation|bash make.sh Exec-5|
