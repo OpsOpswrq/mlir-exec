@@ -15,3 +15,4 @@ Detail for each chapter just looking into the specifical chapter main.cpp
 |ex3-define_operation| define a operation for the dialect|bash make.sh Exec-3|
 |ex4-define_pass|define a pass for the dialect|bash make.sh Exec-4|
 |ex5-rewrite_pattern|for a op to define a rewrite pattern, and transformation its operation|bash make.sh Exec-5|
+|ex6-lit_for_test|build a opt tool for the purpose of test|bash make.sh Exec-6 && bash make.sh check-ch-6|
